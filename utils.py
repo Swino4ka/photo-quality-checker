@@ -1,14 +1,13 @@
 import cv2
 import numpy as np
 
-# Загружаем каскады (укажите путь к файлам XML в папке classifiers)
 face_cascade = cv2.CascadeClassifier("classifiers/haarcascade_frontalface_default.xml")
 eye_cascade  = cv2.CascadeClassifier("classifiers/haarcascade_eye.xml")
 
 def detect_face_and_eyes(image):
     """
-    Детектирует лицо и глаза на изображении.
-    Возвращает список лиц, где для каждого лица возвращается (x, y, w, h) и список глаз (каждый глаз: (ex, ey, ew, eh))
+    Detects a face and eyes in an image.
+    Returns a list of faces, where for each face it returns (x, y, w, h) and a list of eyes (each eye: (ex, ey, ew, eh))
     """
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
@@ -21,44 +20,43 @@ def detect_face_and_eyes(image):
 
 def analyze_exposure(image):
     """
-    Анализирует экспозицию изображения.
-    Возвращает среднее значение яркости (0-255) для всего изображения.
+    Analyzes the exposure of an image.
+    Returns the average brightness value (0-255) for the entire image.
     """
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # Рассчитаем среднее значение яркости
+    # The average brightness is calculated as the mean value of all pixels in the image
     mean_val = np.mean(gray)
     return mean_val
 
 def evaluate_image(image, face_data, mean_brightness,
                    brightness_good=(80, 170)):
     """
-    Оценивает изображение по трем параметрам:
-      - Наличие лица (face_data не пустое)
-      - Наличие 2 глаз (на первом найденном лице)
-      - Средняя яркость внутри допустимого диапазона (brightness_good)
-    Возвращает оценку: "хорошая", "средняя", "плохая"
+    Evaluates an image by three parameters:
+       - Presence of a face (face_data is not empty)
+       - Presence of 2 eyes (on the first found face)
+       - Average brightness within the acceptable range (brightness_good)
+    Returns a rating: "good", "average", "bad"
     """
-    # Если лица не обнаружены, сразу плохая оценка
     if len(face_data) == 0:
         return "плохая"
     
-    # Оценим наличие глаз у первого лица (можно доработать для нескольких лиц)
+    # Evaluates the presence of eyes in the first person (can be improved for several persons)
     eyes = face_data[0]["eyes"]
     if len(eyes) < 2:
         eye_status = False
     else:
         eye_status = True
 
-    # Оценим экспозицию
+    # Evaluates the average brightness of the image
     if brightness_good[0] <= mean_brightness <= brightness_good[1]:
         exposure_status = True
     else:
         exposure_status = False
 
-    # Простой алгоритм оценки:
+    # Returns the final rating
     if eye_status and exposure_status:
-        return "хорошая"
+        return "good"
     elif not eye_status and not exposure_status:
-        return "плохая"
+        return "bad"
     else:
-        return "средняя"
+        return "average"

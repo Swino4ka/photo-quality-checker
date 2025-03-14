@@ -2,15 +2,12 @@ import os
 import cv2
 from utils import detect_face_and_eyes, analyze_exposure, evaluate_image
 
-# Папка с изображениями
 images_folder = "images"
 
-# Списки для результатов
 good_images = []
 average_images = []
 bad_images = []
 
-# Проходим по файлам в папке
 for filename in os.listdir(images_folder):
     if filename.lower().endswith((".jpg", ".jpeg", ".png", ".bmp")):
         filepath = os.path.join(images_folder, filename)
@@ -18,26 +15,22 @@ for filename in os.listdir(images_folder):
         if image is None:
             continue
 
-        # Детектируем лицо и глаза
         face_data = detect_face_and_eyes(image)
-        # Анализ экспозиции
         mean_brightness = analyze_exposure(image)
-        # Оцениваем изображение
         rating = evaluate_image(image, face_data, mean_brightness)
         
-        # Выводим информацию
-        print(f"{filename}: {rating} (средняя яркость: {mean_brightness:.1f}, найдено лиц: {len(face_data)})")
+        print(f"{filename}: {rating} (average brightness: {mean_brightness:.1f}, found faces: {len(face_data)})")
         
-        if rating == "хорошая":
+        if rating == "good":
             good_images.append(filename)
-        elif rating == "средняя":
+        elif rating == "average":
             average_images.append(filename)
         else:
             bad_images.append(filename)
 
-print("\nХорошие фотографии:")
+print("\nGood photos:")
 print("\n".join(good_images))
-print("\nСредние фотографии:")
+print("\nAverage photos:")
 print("\n".join(average_images))
-print("\nПлохие фотографии:")
+print("\nBad photos:")
 print("\n".join(bad_images))
