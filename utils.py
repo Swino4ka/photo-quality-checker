@@ -38,7 +38,7 @@ def evaluate_image(image, face_data, mean_brightness,
     Returns a rating: "good", "average", "bad"
     """
     if len(face_data) == 0:
-        return "плохая"
+        return "bad"
     
     # Evaluates the presence of eyes in the first person (can be improved for several persons)
     eyes = face_data[0]["eyes"]
